@@ -1,0 +1,11 @@
+app: haitatsu
+user: haitatsu
+
+repo: haitatsu
+remote: haitatsu@example.com
+
+location: /srv/haitatsu
+
+servers:
+  application-server:
+    host: example.com
