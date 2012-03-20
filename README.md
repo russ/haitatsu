@@ -1,24 +1,43 @@
 # Haitatsu
 
-TODO: Write a gem description
+Push style deployment, for those times you can't use Heroku.
 
 ## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'haitatsu'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
 
     $ gem install haitatsu
 
 ## Usage
 
-TODO: Write usage instructions here
+Add a .haitatsu file to your project.
+
+Here is a sample configuration.
+
+    app: haitatsu
+    user: haitatsu
+
+    repo: haitatsu
+    remote: haitatsu@example.com
+
+    location: /srv/haitatsu
+
+    servers:
+      application-server:
+        host: example.com
+        tasks:
+          - "bundle exec whenever --update-crontab"
+
+
+Then run haitatsu to deploy your application.
+
+    $ haitatsu
+
+You can also make the deployment verbose.
+
+    $ haitatsu -V
+
+As well as force the deploy even if the version deployed is current.
+
+    $ haitatsu -f
 
 ## Contributing
 
