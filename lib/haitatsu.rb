@@ -15,7 +15,7 @@ program(:name, "Haitatsu")
 program(:version, "0.0.1")
 program(:description, "Push oriented deployment.")
 
-default_command(:deploy)
+default_command(:help)
 
 global_option("-c", "--config FILE", "Configuration file.")
 global_option("-f", "--force", "Force a deployment.")
@@ -31,14 +31,11 @@ command(:deploy) do |c|
     $FORCE = options.force
     $VERBOSE = options.verbose
 
-    $CONFIG["servers"].each do |name, attributes|
-      server = attributes.merge("name" => name)
-      runner.run(:check, "Checking repository ", server)
-      runner.run(:check_for_updates, "Checking for updates ", server)
-      runner.run(:push, "Pushing new commits ", server)
-      runner.run(:setup, "Setting up app ", server)
-      runner.run(:launch, "Launching app ", server)
-    end
+    runner.run(:check, "Checking repository ")
+    runner.run(:check_for_updates, "Checking for updates ")
+    runner.run(:push, "Pushing new commits ")
+    runner.run(:setup, "Setting up app ")
+    runner.run(:launch, "Launching app ")
 
     say("\n<%= color('DONE', BOLD) %>\n")
   end

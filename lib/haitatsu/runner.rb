@@ -4,13 +4,13 @@ module Haitatsu
 
     class ExecutionError < Exception; end
 
-    def run(method, output, server)
+    def run(method, output)
       say(output)
 
       fork do
         begin
           print "\n\n" if $VERBOSE
-          send(method, server)
+          send(method)
           print "\n"
         rescue ExecutionError => e
           handle_error(e)
@@ -29,7 +29,7 @@ module Haitatsu
       exit 1
     end
 
-    def check(server)
+    def check
       `git remote add #{$CONFIG["app"]} #{$CONFIG["remote"]}:#{$CONFIG["location"]} 2>&1 /dev/null`
 
       command = <<-EOF
@@ -41,10 +41,10 @@ module Haitatsu
         fi
       EOF
 
-      execute(command, server)
+      execute(command, $CONFIG["servers"])
     end
 
-    def check_for_updates(server)
+    def check_for_updates
       return if $FORCE
 
       local_revision = `git rev-parse HEAD`.strip
@@ -56,7 +56,7 @@ module Haitatsu
       end
     end
 
-    def push(server)
+    def push
       Open3.popen3("git push #{$CONFIG["repo"]}") do |stdin, stdout, stderr|
         unless $? == 0
           raise ExecutionError.new(stderr.read)
@@ -64,7 +64,7 @@ module Haitatsu
       end
     end
 
-    def setup(server)
+    def setup
       command = <<-EOF
         set -e
         . .profile
@@ -73,12 +73,23 @@ module Haitatsu
         bundle install --deployment --without development test
       EOF
 
-      execute(command, server)
+      execute(command, $CONFIG["servers"])
     end
 
-    def launch(server)
-      server["tasks"].each { |t| execute(t, server) } if server["tasks"]
-      execute("sudo sv restart #{$CONFIG["app"]}", server)
+    def launch
+      $CONFIG["servers"].each do |name, attributes|
+        fork do
+          if attributes["tasks"]
+            attributes["tasks"].each do |t|
+              execute(t, [[ name, attributes ]])
+            end
+          end
+        end
+      end
+
+      Process.waitall
+
+      execute("sudo sv restart #{$CONFIG["app"]}", $CONFIG["servers"])
     end
   end
 end
