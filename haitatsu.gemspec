@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency("commander")
   gem.add_dependency("grit")
   gem.add_dependency("net-ssh")
+  gem.add_dependency("net-ssh-multi")
 
   gem.add_development_dependency("rake")
   gem.add_development_dependency("rspec", "~> 2.5")
